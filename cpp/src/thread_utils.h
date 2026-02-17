@@ -16,10 +16,10 @@
 namespace Common {
     inline bool setThreadCore(int core_id) noexcept {
 #ifdef __linux__
-        cpu_set_t cpuset;
-        CPU_ZERO(&cpuset);
-        CPU_SET(core_id, &cpuset);
-        return (pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset) == 0);
+        cpu_set_t cpu_set;
+        CPU_ZERO(&cpu_set);
+        CPU_SET(core_id, &cpu_set);
+        return (pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpu_set) == 0);
 #else
         (void)core_id;
         return true;
@@ -27,7 +27,7 @@ namespace Common {
     }
 
     template<typename T, typename... A>
-    inline std::optional<std::thread> createAndStartThread(int core_id, const std::string &name, T &&func, A &&... args) {
+    std::optional<std::thread> createAndStartThread(int core_id, const std::string &name, T &&func, A &&... args) {
         using Fn = std::decay_t<T>;
         using ArgsTuple = std::tuple<std::decay_t<A>...>;
         Fn fn(std::forward<T>(func));

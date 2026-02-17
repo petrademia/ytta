@@ -1,19 +1,22 @@
-.PHONY: all help cpp cpp-run cpp-bench cpp-test rust rust-run rust-test go go-run go-test java java-run java-test test
+.PHONY: all help cpp cpp-run cpp-mem-pool-run cpp-bench cpp-test rust rust-run rust-test go go-run go-test java java-run java-test test
 
 all: cpp rust go java
 
 help:
-	@echo "Targets: cpp cpp-run cpp-bench cpp-test rust rust-run rust-test go go-run go-test java java-run java-test test"
+	@echo "Targets: cpp cpp-run cpp-mem-pool-run cpp-bench cpp-test rust rust-run rust-test go go-run go-test java java-run java-test test"
 
 cpp:
 	cmake -S cpp -B cpp/build
 	cmake --build cpp/build
 
 cpp-run: cpp
-	./cpp/build/ytta_cpp
+	./cpp/build/ytta_thread_demo
+
+cpp-mem-pool-run: cpp
+	./cpp/build/ytta_mem_pool_demo
 
 cpp-bench:
-	@N=$${N:-10}; BIN=$${BIN:-./cpp/build/ytta_cpp}; OUT=$$(mktemp); \
+	@N=$${N:-10}; BIN=$${BIN:-./cpp/build/ytta_thread_demo}; OUT=$$(mktemp); \
 	i=1; \
 	while [ $$i -le $$N ]; do \
 		$$BIN >> $$OUT; \
