@@ -1,0 +1,52 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE/editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build artifacts
+build/
+out/
+target/
+bin/
+main
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.lib
+
+# CMake
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+.gradle/
+.settings/
+.classpath
+.project
+
+# Go
+coverage.out
+
+# Caches/temp
+.cache/
+tmp/
+*.tmp
+
+# Logs
+*.log

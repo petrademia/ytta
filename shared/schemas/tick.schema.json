@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Tick",
+  "type": "object",
+  "required": ["ts", "instrument", "side", "price", "size", "seq"],
+  "properties": {
+    "ts": { "type": "string", "format": "date-time" },
+    "instrument": { "type": "string", "minLength": 1 },
+    "side": { "type": "string", "enum": ["BID", "ASK", "TRADE"] },
+    "price": { "type": "number", "exclusiveMinimum": 0 },
+    "size": { "type": "number", "exclusiveMinimum": 0 },
+    "seq": { "type": "integer", "minimum": 0 }
+  },
+  "additionalProperties": false
+}

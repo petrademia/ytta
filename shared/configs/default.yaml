@@ -1,0 +1,10 @@
+app:
+  name: ytta
+  mode: dev
+
+latency:
+  budget_micros: 250
+
+risk:
+  max_position: 100
+  max_notional: 100000
