@@ -1,9 +1,9 @@
-.PHONY: all help cpp cpp-run cpp-mem-pool-run cpp-bench cpp-test rust rust-run rust-run-v0 rust-test go go-run go-run-v0 go-test java java-run java-test test
+.PHONY: all help cpp cpp-run cpp-mem-pool-run cpp-bench cpp-test rust rust-run rust-run-v0 rust-test go go-run go-run-v0 go-test java java-run java-run-v0 java-test test
 
 all: cpp rust go java
 
 help:
-	@echo "Targets: cpp cpp-run cpp-mem-pool-run cpp-bench cpp-test rust rust-run rust-run-v0 rust-test go go-run go-run-v0 go-test java java-run java-test test"
+	@echo "Targets: cpp cpp-run cpp-mem-pool-run cpp-bench cpp-test rust rust-run rust-run-v0 rust-test go go-run go-run-v0 go-test java java-run java-run-v0 java-test test"
 
 cpp:
 	cmake -S cpp -B cpp/build
@@ -58,6 +58,9 @@ java:
 
 java-run: java
 	java -cp java/target/ytta-java-0.1.0.jar com.ytta.App
+
+java-run-v0: java
+	java -cp java/target/ytta-java-0.1.0.jar com.ytta.v0.YttaV0 --fixture shared/fixtures/v0/ticks.ndjson --out /tmp/ytta_java_out.ndjson
 
 java-test:
 	mvn -q -f java/pom.xml test
