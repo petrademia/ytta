@@ -1,9 +1,9 @@
-.PHONY: all help cpp cpp-run cpp-mem-pool-run cpp-bench cpp-test rust rust-run rust-test go go-run go-test java java-run java-test test
+.PHONY: all help cpp cpp-run cpp-mem-pool-run cpp-bench cpp-test rust rust-run rust-test go go-run go-run-v0 go-test java java-run java-test test
 
 all: cpp rust go java
 
 help:
-	@echo "Targets: cpp cpp-run cpp-mem-pool-run cpp-bench cpp-test rust rust-run rust-test go go-run go-test java java-run java-test test"
+	@echo "Targets: cpp cpp-run cpp-mem-pool-run cpp-bench cpp-test rust rust-run rust-test go go-run go-run-v0 go-test java java-run java-test test"
 
 cpp:
 	cmake -S cpp -B cpp/build
@@ -43,6 +43,9 @@ go:
 
 go-run:
 	cd go && go run ./cmd/ytta
+
+go-run-v0:
+	cd go && go run ./cmd/ytta_v0 --fixture ../shared/fixtures/v0/ticks.ndjson --out /tmp/ytta_go_out.ndjson
 
 go-test:
 	cd go && go test ./...
