@@ -26,6 +26,8 @@ set(YTTA_V0_SOURCES
     src/v0/pipeline.cpp
     src/v0/net/framing.cpp
     src/v0/net/tcp.cpp
+    src/v0/engine_server.cpp
+    src/v0/tcp_order_gateway.cpp
 )
 
 add_library(ytta_v0_lib STATIC ${YTTA_V0_SOURCES})
@@ -50,3 +52,13 @@ add_executable(ytta_v0
     src/v0_main.cpp
 )
 target_link_libraries(ytta_v0 PRIVATE ytta_v0_lib)
+
+add_executable(ytta_engine
+    src/v0_engine_main.cpp
+)
+target_link_libraries(ytta_engine PRIVATE ytta_v0_lib)
+
+add_executable(ytta_client
+    src/v0_client_main.cpp
+)
+target_link_libraries(ytta_client PRIVATE ytta_v0_lib)
