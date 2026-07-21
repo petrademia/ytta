@@ -27,10 +27,10 @@ Harden the existing v0 tick-to-trade slice with book-shaped hot-path primitives:
 
 ## Acceptance (C++ Stage 1 done)
 
-- [ ] `make cpp-test` still passes v0 golden byte-compare
-- [ ] Queued (or dual) pipeline path can produce the same v0 golden
-- [ ] SPSC unit tests: capacity, full/empty, FIFO order
-- [ ] Burst run completes with zero drops (or documented drop policy + test for “no drop” config)
-- [ ] stderr latency includes e2e + stage breakdown (p50/p99)
-- [ ] `specs/stage1_hotpath.md` (or this doc + messages addendum) describes queue topology and probe fields
-- [ ] `cpp/README.md` documents sync vs queued vs burst invocations
+- [x] `make cpp-test` still passes v0 golden byte-compare
+- [x] Queued (or dual) pipeline path can produce the same v0 golden
+- [x] SPSC unit tests: capacity, full/empty, FIFO order
+- [x] Burst run completes with zero drops (or documented drop policy + test for “no drop” config)
+- [x] stderr latency includes e2e + stage breakdown (p50/p99)
+- [x] `specs/stage1_hotpath.md` (or this doc + messages addendum) describes queue topology and probe fields
+- [x] `cpp/README.md` documents sync vs queued vs burst invocations
