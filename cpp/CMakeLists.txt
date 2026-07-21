@@ -24,6 +24,8 @@ set(YTTA_V0_SOURCES
     src/v0/tick_source.cpp
     src/v0/strategy.cpp
     src/v0/pipeline.cpp
+    src/v0/net/framing.cpp
+    src/v0/net/tcp.cpp
 )
 
 add_library(ytta_v0_lib STATIC ${YTTA_V0_SOURCES})
@@ -38,6 +40,11 @@ add_executable(ytta_v0_spsc_tests
     tests/v0_spsc_test.cpp
 )
 target_link_libraries(ytta_v0_spsc_tests PRIVATE ytta_v0_lib)
+
+add_executable(ytta_v0_net_tests
+    tests/v0_net_test.cpp
+)
+target_link_libraries(ytta_v0_net_tests PRIVATE ytta_v0_lib)
 
 add_executable(ytta_v0
     src/v0_main.cpp
