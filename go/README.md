@@ -5,16 +5,29 @@
 go run ./cmd/ytta
 ```
 
-## v0 tick-to-trade slice
-From the `go/` directory (fixture paths relative to repo root):
+## v0 / Stage 1 tick-to-trade slice
+From the `go/` directory:
 
 ```bash
-go run ./cmd/ytta_v0 \
+# sync
+go run ./cmd/ytta_v0 --mode=sync \
+  --fixture ../shared/fixtures/v0/ticks.ndjson \
+  --out /tmp/ytta_go_out.ndjson
+
+# queued (SPSC ingress; same golden)
+go run ./cmd/ytta_v0 --mode=queued \
   --fixture ../shared/fixtures/v0/ticks.ndjson \
   --out /tmp/ytta_go_out.ndjson
 ```
 
-Latency summary (`p50_ns` / `p99_ns`) prints to stderr.
+### Burst (Stage 1)
+```bash
+go run ./cmd/ytta_v0 --mode=queued \
+  --fixture ../shared/fixtures/v1/ticks_burst.ndjson \
+  --out /tmp/ytta_go_burst.ndjson
+```
+
+Latency JSON on stderr includes e2e + ingest/decide/execute p50/p99 and `drops`. Absolute µs values are not a CI gate.
 
 From repo root:
 ```bash
@@ -27,10 +40,8 @@ make go-test
 go test ./...
 ```
 
-### v0 acceptance (Go)
-- [x] Builds and replays shared fixture
-- [x] Emits canonical stream matching `shared/fixtures/v0/golden.ndjson`
-- [x] Strategy emits `NEW_ORDER` and `CANCEL`
-- [x] MatchingEngine maintains one book
-- [x] Reports e2e latency p50/p99 on stderr
-- [x] Golden smoke test in `go test ./...`
+### Acceptance (Go)
+- [x] v0 golden (sync + queued)
+- [x] SPSC + object pool unit tests
+- [x] Stage latency probe fields on stderr
+- [x] Burst smoke: drops==0, action count == N

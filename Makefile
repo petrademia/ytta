@@ -50,7 +50,7 @@ go-run:
 	cd go && go run ./cmd/ytta
 
 go-run-v0:
-	cd go && go run ./cmd/ytta_v0 --fixture ../shared/fixtures/v0/ticks.ndjson --out /tmp/ytta_go_out.ndjson
+	cd go && go run ./cmd/ytta_v0 --mode=queued --fixture ../shared/fixtures/v0/ticks.ndjson --out /tmp/ytta_go_out.ndjson
 
 go-test:
 	cd go && go test ./...
