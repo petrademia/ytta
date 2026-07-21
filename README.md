@@ -16,6 +16,7 @@ Spec-first thin vertical slice: C++ leads each milestone, then Go / Rust / Java 
 - Locked decisions: `docs/superpowers/specs/2026-07-22-v0-learning-path-design.md`
 - Messages + strategy: `specs/v0_messages.md`
 - Stage 1 hot-path: `docs/superpowers/specs/2026-07-22-stage1-hotpath.md` + `specs/stage1_hotpath.md`
+- Stage 2 sockets: `docs/superpowers/specs/2026-07-22-stage2-sockets.md` + `specs/stage2_sockets.md`
 
 ## Repository Layout
 - `docs/` — architecture and design notes
