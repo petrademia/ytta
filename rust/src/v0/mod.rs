@@ -13,7 +13,8 @@ pub use book::Book;
 pub use engine::MatchingEngine;
 pub use gateway::OrderGateway;
 pub use pipeline::{
-    format_action, format_engine_event, run_pipeline, sort_golden, GoldenEvent, GoldenType,
+    format_action, format_engine_event, run_pipeline, run_pipeline_mode, sort_golden, GoldenEvent,
+    GoldenType, PipelineMode,
 };
 pub use pool::ObjectPool;
 pub use probe::{LatencyProbe, LatencySummary};
