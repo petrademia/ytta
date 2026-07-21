@@ -12,7 +12,7 @@ Thumbs.db
 build/
 out/
 target/
-bin/
+/bin/
 /main
 *.o
 *.obj
