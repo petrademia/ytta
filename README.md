@@ -9,6 +9,11 @@ collect market/runtime signals quickly, decide quickly, and execute quickly.
 - Go (`go/`)
 - Java (`java/`)
 
+## Current path (locked)
+
+Spec-first thin vertical slice: C++ leads each milestone, then Go / Rust / Java to golden parity.
+Details: `docs/superpowers/specs/2026-07-22-v0-learning-path-design.md`.
+
 ## Repository Layout
 - `docs/` - architecture and design notes
 - `specs/` - protocol and behavior specs
