@@ -34,6 +34,11 @@ add_executable(ytta_v0_tests
 )
 target_link_libraries(ytta_v0_tests PRIVATE ytta_v0_lib)
 
+add_executable(ytta_v0_spsc_tests
+    tests/v0_spsc_test.cpp
+)
+target_link_libraries(ytta_v0_spsc_tests PRIVATE ytta_v0_lib)
+
 add_executable(ytta_v0
     src/v0_main.cpp
 )
