@@ -62,7 +62,7 @@ java-run: java
 	java -cp java/target/ytta-java-0.1.0.jar com.ytta.App
 
 java-run-v0: java
-	java -cp java/target/ytta-java-0.1.0.jar com.ytta.v0.YttaV0 --fixture shared/fixtures/v0/ticks.ndjson --out /tmp/ytta_java_out.ndjson
+	java -cp java/target/ytta-java-0.1.0.jar com.ytta.v0.YttaV0 --mode=queued --fixture shared/fixtures/v0/ticks.ndjson --out /tmp/ytta_java_out.ndjson
 
 java-test:
 	mvn -q -f java/pom.xml test
