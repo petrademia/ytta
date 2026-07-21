@@ -1,6 +1,7 @@
 #include "pipeline.hpp"
 
 #include "matching_engine.hpp"
+#include "spsc_queue.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -21,6 +22,56 @@ int type_rank(GoldenType t) {
       return 3;
   }
   return 99;
+}
+
+void append_action_and_engine(std::vector<GoldenEvent>& out, Strategy& strategy,
+                              OrderGateway& gateway, const Tick& tick,
+                              LatencyProbe& probe,
+                              std::chrono::steady_clock::time_point e2e_start,
+                              std::int64_t ingest_ns) {
+  const auto decide_start = std::chrono::steady_clock::now();
+  const StrategyAction action = strategy.on_tick(tick);
+  const auto decide_end = std::chrono::steady_clock::now();
+
+  GoldenEvent ge;
+  ge.ts_ns = action.ts_ns;
+  ge.type = GoldenType::Action;
+  ge.cl_ord_id = (action.kind == ActionKind::Noop) ? 0 : action.cl_ord_id;
+  ge.line = format_action(action);
+  out.push_back(std::move(ge));
+
+  const auto execute_start = std::chrono::steady_clock::now();
+  if (action.kind != ActionKind::Noop) {
+    std::vector<EngineEvent> events;
+    if (action.kind == ActionKind::NewOrder) {
+      events = gateway.new_order(
+          Order{action.cl_ord_id, action.side, action.price, action.qty},
+          action.ts_ns);
+    } else {
+      events = gateway.cancel(action.cl_ord_id, action.ts_ns);
+    }
+    for (const auto& ev : events) {
+      GoldenEvent ee;
+      ee.ts_ns = action.ts_ns;
+      ee.line = format_engine_event(ev);
+      if (const auto* ack = std::get_if<AckEvent>(&ev)) {
+        ee.type = GoldenType::Ack;
+        ee.cl_ord_id = ack->cl_ord_id;
+      } else if (const auto* fill = std::get_if<FillEvent>(&ev)) {
+        ee.type = GoldenType::Fill;
+        ee.cl_ord_id = fill->cl_ord_id;
+      } else {
+        ee.type = GoldenType::Md;
+        ee.cl_ord_id = 0;
+      }
+      out.push_back(std::move(ee));
+    }
+  }
+  const auto execute_end = std::chrono::steady_clock::now();
+
+  probe.record_stages(steady_ns_between(e2e_start, execute_end), ingest_ns,
+                      steady_ns_between(decide_start, decide_end),
+                      steady_ns_between(execute_start, execute_end));
 }
 
 }  // namespace
@@ -93,52 +144,62 @@ void sort_golden(std::vector<GoldenEvent>& events) {
 }
 
 std::vector<GoldenEvent> Pipeline::run(const std::vector<Tick>& ticks,
-                                       LatencyProbe& probe) {
+                                       LatencyProbe& probe,
+                                       PipelineMode mode) {
+  if (mode == PipelineMode::Queued) {
+    return run_queued(ticks, probe);
+  }
+  return run_sync(ticks, probe);
+}
+
+std::vector<GoldenEvent> Pipeline::run_sync(const std::vector<Tick>& ticks,
+                                            LatencyProbe& probe) {
   MatchingEngine engine;
   OrderGateway gateway(engine);
   Strategy strategy;
   std::vector<GoldenEvent> out;
 
   for (const auto& tick : ticks) {
-    const auto t0 = std::chrono::steady_clock::now();
-    const StrategyAction action = strategy.on_tick(tick);
+    const auto e2e_start = std::chrono::steady_clock::now();
+    // Sync ingest is a no-op handoff (copy already owned by caller).
+    const auto ingest_end = std::chrono::steady_clock::now();
+    append_action_and_engine(out, strategy, gateway, tick, probe, e2e_start,
+                             steady_ns_between(e2e_start, ingest_end));
+  }
 
-    GoldenEvent ge;
-    ge.ts_ns = action.ts_ns;
-    ge.type = GoldenType::Action;
-    ge.cl_ord_id =
-        (action.kind == ActionKind::Noop) ? 0 : action.cl_ord_id;
-    ge.line = format_action(action);
-    out.push_back(std::move(ge));
+  sort_golden(out);
+  return out;
+}
 
-    if (action.kind != ActionKind::Noop) {
-      std::vector<EngineEvent> events;
-      if (action.kind == ActionKind::NewOrder) {
-        events = gateway.new_order(
-            Order{action.cl_ord_id, action.side, action.price, action.qty},
-            action.ts_ns);
-      } else {
-        events = gateway.cancel(action.cl_ord_id, action.ts_ns);
-      }
-      for (const auto& ev : events) {
-        GoldenEvent ee;
-        ee.ts_ns = action.ts_ns;
-        ee.line = format_engine_event(ev);
-        if (const auto* ack = std::get_if<AckEvent>(&ev)) {
-          ee.type = GoldenType::Ack;
-          ee.cl_ord_id = ack->cl_ord_id;
-        } else if (const auto* fill = std::get_if<FillEvent>(&ev)) {
-          ee.type = GoldenType::Fill;
-          ee.cl_ord_id = fill->cl_ord_id;
-        } else {
-          ee.type = GoldenType::Md;
-          ee.cl_ord_id = 0;
-        }
-        out.push_back(std::move(ee));
-      }
+std::vector<GoldenEvent> Pipeline::run_queued(const std::vector<Tick>& ticks,
+                                              LatencyProbe& probe) {
+  // Capacity covers v0 + stage1 burst fixtures without drops when >= tick count.
+  constexpr std::size_t kCap = 16384;
+  SpscQueue<Tick, kCap> queue;
+
+  MatchingEngine engine;
+  OrderGateway gateway(engine);
+  Strategy strategy;
+  std::vector<GoldenEvent> out;
+
+  for (const auto& tick : ticks) {
+    const auto e2e_start = std::chrono::steady_clock::now();
+    const auto ingest_start = e2e_start;
+    if (!queue.try_push(tick)) {
+      probe.add_drop();
+      continue;
+    }
+    const auto ingest_end = std::chrono::steady_clock::now();
+
+    Tick consumed;
+    if (!queue.try_pop(consumed)) {
+      // Should be unreachable after a successful push on a single-threaded pump.
+      probe.add_drop();
+      continue;
     }
 
-    probe.record_ns(steady_ns_since(t0));
+    append_action_and_engine(out, strategy, gateway, consumed, probe, e2e_start,
+                             steady_ns_between(ingest_start, ingest_end));
   }
 
   sort_golden(out);
