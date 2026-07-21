@@ -28,8 +28,10 @@ cpp-bench:
 cpp-test: cpp
 	./cpp/build/ytta_v0_tests
 	./cpp/build/ytta_v0_spsc_tests
+	./cpp/build/ytta_v0_net_tests
 	./cpp/tests/run_v0_golden.sh
 	./cpp/tests/run_stage1_burst.sh
+	./cpp/tests/run_v0_tcp_golden.sh
 
 rust:
 	cargo build --manifest-path rust/Cargo.toml
