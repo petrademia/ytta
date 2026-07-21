@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ytta.local/schemas/v0/md.schema.json",
+  "title": "YTTA v0 Market Data",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "ts_ns",
+    "instrument",
+    "best_bid",
+    "best_ask",
+    "best_bid_qty",
+    "best_ask_qty"
+  ],
+  "properties": {
+    "type": { "const": "md" },
+    "ts_ns": { "type": "integer", "minimum": 0 },
+    "instrument": { "type": "string", "minLength": 1 },
+    "best_bid": { "type": "integer", "minimum": 0 },
+    "best_ask": { "type": "integer", "minimum": 0 },
+    "best_bid_qty": { "type": "integer", "minimum": 0 },
+    "best_ask_qty": { "type": "integer", "minimum": 0 }
+  }
+}

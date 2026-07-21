@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ytta.local/schemas/v0/tick.schema.json",
+  "title": "YTTA v0 Tick",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "ts_ns", "instrument", "side", "price", "qty", "seq"],
+  "properties": {
+    "type": { "const": "tick" },
+    "ts_ns": { "type": "integer", "minimum": 0 },
+    "instrument": { "type": "string", "minLength": 1 },
+    "side": { "type": "string", "enum": ["BUY", "SELL"] },
+    "price": { "type": "integer", "exclusiveMinimum": 0 },
+    "qty": { "type": "integer", "exclusiveMinimum": 0 },
+    "seq": { "type": "integer", "minimum": 1 }
+  }
+}

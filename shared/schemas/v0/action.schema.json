@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ytta.local/schemas/v0/action.schema.json",
+  "title": "YTTA v0 Action",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "ts_ns", "action", "reason"],
+  "properties": {
+    "type": { "const": "action" },
+    "ts_ns": { "type": "integer", "minimum": 0 },
+    "action": { "type": "string", "enum": ["NOOP", "NEW_ORDER", "CANCEL"] },
+    "cl_ord_id": { "type": "integer", "minimum": 1 },
+    "side": { "type": "string", "enum": ["BUY", "SELL"] },
+    "price": { "type": "integer", "exclusiveMinimum": 0 },
+    "qty": { "type": "integer", "exclusiveMinimum": 0 },
+    "reason": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "action": { "const": "NEW_ORDER" } } },
+      "then": { "required": ["cl_ord_id", "side", "price", "qty"] }
+    },
+    {
+      "if": { "properties": { "action": { "const": "CANCEL" } } },
+      "then": { "required": ["cl_ord_id"] }
+    }
+  ]
+}

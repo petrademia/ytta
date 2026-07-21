@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ytta.local/schemas/v0/fill.schema.json",
+  "title": "YTTA v0 Fill",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "ts_ns", "cl_ord_id", "price", "qty", "liquidity"],
+  "properties": {
+    "type": { "const": "fill" },
+    "ts_ns": { "type": "integer", "minimum": 0 },
+    "cl_ord_id": { "type": "integer", "minimum": 1 },
+    "price": { "type": "integer", "exclusiveMinimum": 0 },
+    "qty": { "type": "integer", "exclusiveMinimum": 0 },
+    "liquidity": { "type": "string", "enum": ["MAKER", "TAKER"] }
+  }
+}

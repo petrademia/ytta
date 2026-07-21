@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ytta.local/schemas/v0/ack.schema.json",
+  "title": "YTTA v0 Ack",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "ts_ns", "cl_ord_id", "status"],
+  "properties": {
+    "type": { "const": "ack" },
+    "ts_ns": { "type": "integer", "minimum": 0 },
+    "cl_ord_id": { "type": "integer", "minimum": 1 },
+    "status": { "type": "string", "enum": ["ACCEPTED", "REJECTED"] },
+    "reason": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "REJECTED" } } },
+      "then": { "required": ["reason"] }
+    }
+  ]
+}
