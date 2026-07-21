@@ -38,7 +38,7 @@ rust-run:
 	cargo run --manifest-path rust/Cargo.toml
 
 rust-run-v0:
-	cargo run --manifest-path rust/Cargo.toml --bin ytta_v0 -- --fixture shared/fixtures/v0/ticks.ndjson --out /tmp/ytta_rust_out.ndjson
+	cargo run --manifest-path rust/Cargo.toml --bin ytta_v0 -- --mode=queued --fixture shared/fixtures/v0/ticks.ndjson --out /tmp/ytta_rust_out.ndjson
 
 rust-test:
 	cargo test --manifest-path rust/Cargo.toml
