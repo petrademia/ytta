@@ -13,7 +13,7 @@ build/
 out/
 target/
 bin/
-main
+/main
 *.o
 *.obj
 *.a

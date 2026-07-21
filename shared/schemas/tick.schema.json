@@ -1,8 +1,0 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Tick (deprecated)",
-  "description": "DEPRECATED. Do not use float/date-time ticks. Use shared/schemas/v0/tick.schema.json (integer price/qty, ts_ns). See specs/v0_messages.md.",
-  "deprecated": true,
-  "type": "object",
-  "not": {}
-}
