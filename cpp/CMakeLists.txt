@@ -17,3 +17,16 @@ add_executable(ytta_mem_pool_demo
     src/mem_pool.cpp
 )
 target_include_directories(ytta_mem_pool_demo PRIVATE include)
+
+set(YTTA_V0_SOURCES
+    src/v0/book.cpp
+    src/v0/matching_engine.cpp
+)
+
+add_library(ytta_v0_lib STATIC ${YTTA_V0_SOURCES})
+target_include_directories(ytta_v0_lib PUBLIC src/v0)
+
+add_executable(ytta_v0_tests
+    tests/v0_book_test.cpp
+)
+target_link_libraries(ytta_v0_tests PRIVATE ytta_v0_lib)
