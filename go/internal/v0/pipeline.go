@@ -16,6 +16,13 @@ const (
 	GoldenFill
 )
 
+type PipelineMode int8
+
+const (
+	ModeSync PipelineMode = iota
+	ModeQueued
+)
+
 type GoldenEvent struct {
 	TsNs    int64
 	Type    GoldenType
@@ -84,52 +91,102 @@ func SortGolden(events []GoldenEvent) {
 }
 
 func RunPipeline(ticks []Tick, probe *LatencyProbe) []GoldenEvent {
+	return RunPipelineMode(ticks, probe, ModeSync)
+}
+
+func RunPipelineMode(ticks []Tick, probe *LatencyProbe, mode PipelineMode) []GoldenEvent {
+	if mode == ModeQueued {
+		return runQueued(ticks, probe)
+	}
+	return runSync(ticks, probe)
+}
+
+func appendActionAndEngine(out []GoldenEvent, strategy *Strategy, gateway *OrderGateway, tick Tick, probe *LatencyProbe, e2eStart time.Time, ingestNs int64) []GoldenEvent {
+	decideStart := time.Now()
+	action := strategy.OnTick(tick)
+	decideNs := time.Since(decideStart).Nanoseconds()
+
+	cl := uint64(0)
+	if action.Kind != ActionNoop {
+		cl = action.ClOrdID
+	}
+	out = append(out, GoldenEvent{
+		TsNs:    action.TsNs,
+		Type:    GoldenAction,
+		ClOrdID: cl,
+		Line:    FormatAction(action),
+	})
+
+	executeStart := time.Now()
+	if action.Kind != ActionNoop {
+		var events []EngineEvent
+		if action.Kind == ActionNewOrder {
+			events = gateway.NewOrder(Order{
+				ClOrdID: action.ClOrdID,
+				Side:    action.Side,
+				Price:   action.Price,
+				Qty:     action.Qty,
+			}, action.TsNs)
+		} else {
+			events = gateway.Cancel(action.ClOrdID, action.TsNs)
+		}
+		for _, ev := range events {
+			gt, id, line := FormatEngineEvent(ev)
+			out = append(out, GoldenEvent{
+				TsNs:    action.TsNs,
+				Type:    gt,
+				ClOrdID: id,
+				Line:    line,
+			})
+		}
+	}
+	executeNs := time.Since(executeStart).Nanoseconds()
+	probe.RecordStages(time.Since(e2eStart).Nanoseconds(), ingestNs, decideNs, executeNs)
+	return out
+}
+
+func runSync(ticks []Tick, probe *LatencyProbe) []GoldenEvent {
 	engine := NewMatchingEngine()
 	gateway := NewOrderGateway(engine)
 	strategy := NewStrategy()
 	var out []GoldenEvent
 
 	for _, tick := range ticks {
-		t0 := time.Now()
-		action := strategy.OnTick(tick)
-
-		cl := uint64(0)
-		if action.Kind != ActionNoop {
-			cl = action.ClOrdID
-		}
-		out = append(out, GoldenEvent{
-			TsNs:    action.TsNs,
-			Type:    GoldenAction,
-			ClOrdID: cl,
-			Line:    FormatAction(action),
-		})
-
-		if action.Kind != ActionNoop {
-			var events []EngineEvent
-			if action.Kind == ActionNewOrder {
-				events = gateway.NewOrder(Order{
-					ClOrdID: action.ClOrdID,
-					Side:    action.Side,
-					Price:   action.Price,
-					Qty:     action.Qty,
-				}, action.TsNs)
-			} else {
-				events = gateway.Cancel(action.ClOrdID, action.TsNs)
-			}
-			for _, ev := range events {
-				gt, id, line := FormatEngineEvent(ev)
-				out = append(out, GoldenEvent{
-					TsNs:    action.TsNs,
-					Type:    gt,
-					ClOrdID: id,
-					Line:    line,
-				})
-			}
-		}
-
-		probe.RecordNs(time.Since(t0).Nanoseconds())
+		e2eStart := time.Now()
+		ingestNs := time.Since(e2eStart).Nanoseconds()
+		out = appendActionAndEngine(out, strategy, gateway, tick, probe, e2eStart, ingestNs)
 	}
+	SortGolden(out)
+	return out
+}
 
+func runQueued(ticks []Tick, probe *LatencyProbe) []GoldenEvent {
+	const cap = 16384
+	q, err := NewSpscQueue[Tick](cap)
+	if err != nil {
+		panic(err)
+	}
+	engine := NewMatchingEngine()
+	gateway := NewOrderGateway(engine)
+	strategy := NewStrategy()
+	var out []GoldenEvent
+
+	for _, tick := range ticks {
+		e2eStart := time.Now()
+		ingestStart := e2eStart
+		if !q.TryPush(tick) {
+			probe.AddDrop()
+			continue
+		}
+		ingestNs := time.Since(ingestStart).Nanoseconds()
+
+		consumed, ok := q.TryPop()
+		if !ok {
+			probe.AddDrop()
+			continue
+		}
+		out = appendActionAndEngine(out, strategy, gateway, consumed, probe, e2eStart, ingestNs)
+	}
 	SortGolden(out)
 	return out
 }
