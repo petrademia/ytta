@@ -25,8 +25,9 @@ cpp-bench:
 	awk -F= '/^t1 launch ns=/{a+=$$2;c++} /^t2 launch ns=/{b+=$$2} /^t1 execution ns=/{d+=$$2} /^t2 execution ns=/{e+=$$2} /^total wall ns=/{f+=$$2} /^t1 launch cycles=/{g+=$$2} /^t2 launch cycles=/{h+=$$2} /^total cycles=/{j+=$$2} END {if (c==0) {print "No benchmark lines found"; exit 1} printf "runs=%d\navg t1 launch ns=%.2f\navg t2 launch ns=%.2f\navg t1 execution ns=%.2f\navg t2 execution ns=%.2f\navg total wall ns=%.2f\navg t1 launch cycles=%.2f\navg t2 launch cycles=%.2f\navg total cycles=%.2f\n", c, a/c, b/c, d/c, e/c, f/c, g/c, h/c, j/c}' $$OUT; \
 	rm -f $$OUT
 
-cpp-test:
-	@echo "No C++ test runner configured yet"
+cpp-test: cpp
+	./cpp/build/ytta_v0_tests
+	./cpp/tests/run_v0_golden.sh
 
 rust:
 	cargo build --manifest-path rust/Cargo.toml
@@ -55,4 +56,4 @@ java-run: java
 java-test:
 	mvn -q -f java/pom.xml test
 
-test: rust-test go-test java-test
+test: cpp-test rust-test go-test java-test
