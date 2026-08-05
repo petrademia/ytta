@@ -11,3 +11,9 @@ add_executable(ytta_m0_smoke src/smoke/smoke.cpp)
 add_executable(ytta_m1_tests tests/m1_blocks_test.cpp)
 target_include_directories(ytta_m1_tests PRIVATE src/m1)
 target_link_libraries(ytta_m1_tests PRIVATE Threads::Threads)
+
+add_library(ytta_m2_lib STATIC src/m2/matching_engine.cpp)
+target_include_directories(ytta_m2_lib PUBLIC src/m2)
+
+add_executable(ytta_m2_tests tests/m2_engine_test.cpp)
+target_link_libraries(ytta_m2_tests PRIVATE ytta_m2_lib)
