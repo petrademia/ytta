@@ -1,72 +1,44 @@
-.PHONY: all help cpp cpp-run cpp-mem-pool-run cpp-bench cpp-test rust rust-run rust-run-v0 rust-test go go-run go-run-v0 go-test java java-run java-run-v0 java-test test
+.PHONY: all help cpp cpp-test test-m0 test-m1 test-m2 test-m3 test-m4 test-m5 test-m6 test
 
-all: cpp rust go java
+all: cpp
 
 help:
-	@echo "Targets: cpp cpp-run cpp-mem-pool-run cpp-bench cpp-test rust rust-run rust-run-v0 rust-test go go-run go-run-v0 go-test java java-run java-run-v0 java-test test"
+	@echo "Targets: cpp cpp-test test-m0 test-m1 test-m2 test-m3 test-m4 test-m5 test-m6 test"
 
 cpp:
 	cmake -S cpp -B cpp/build
 	cmake --build cpp/build
 
-cpp-run: cpp
-	./cpp/build/ytta_thread_demo
+test-m0: cpp
+	./cpp/build/ytta_m0_smoke
 
-cpp-mem-pool-run: cpp
-	./cpp/build/ytta_mem_pool_demo
+test-m1: cpp
+	./cpp/build/ytta_m1_tests
 
-cpp-bench:
-	@N=$${N:-10}; BIN=$${BIN:-./cpp/build/ytta_thread_demo}; OUT=$$(mktemp); \
-	i=1; \
-	while [ $$i -le $$N ]; do \
-		$$BIN >> $$OUT; \
-		i=$$((i + 1)); \
-	done; \
-	awk -F= '/^t1 launch ns=/{a+=$$2;c++} /^t2 launch ns=/{b+=$$2} /^t1 execution ns=/{d+=$$2} /^t2 execution ns=/{e+=$$2} /^total wall ns=/{f+=$$2} /^t1 launch cycles=/{g+=$$2} /^t2 launch cycles=/{h+=$$2} /^total cycles=/{j+=$$2} END {if (c==0) {print "No benchmark lines found"; exit 1} printf "runs=%d\navg t1 launch ns=%.2f\navg t2 launch ns=%.2f\navg t1 execution ns=%.2f\navg t2 execution ns=%.2f\navg total wall ns=%.2f\navg t1 launch cycles=%.2f\navg t2 launch cycles=%.2f\navg total cycles=%.2f\n", c, a/c, b/c, d/c, e/c, f/c, g/c, h/c, j/c}' $$OUT; \
-	rm -f $$OUT
+test-m2: cpp
+	./cpp/build/ytta_m2_tests
 
-cpp-test: cpp
-	./cpp/build/ytta_v0_tests
-	./cpp/build/ytta_v0_spsc_tests
-	./cpp/build/ytta_v0_net_tests
-	./cpp/tests/run_v0_golden.sh
-	./cpp/tests/run_stage1_burst.sh
-	./cpp/tests/run_v0_tcp_golden.sh
+test-m3: cpp
+	./cpp/build/ytta_m3_tests
 
-rust:
-	cargo build --manifest-path rust/Cargo.toml
+test-m4: cpp
+	./cpp/build/ytta_m4_tests
+	./cpp/tests/run_m4_golden.sh
 
-rust-run:
-	cargo run --manifest-path rust/Cargo.toml
+test-m5: cpp
+	./cpp/build/ytta_m5_tests
 
-rust-run-v0:
-	cargo run --manifest-path rust/Cargo.toml --bin ytta_v0 -- --mode=queued --fixture shared/fixtures/v0/ticks.ndjson --out /tmp/ytta_rust_out.ndjson
+test-m6: cpp
+	./cpp/build/ytta_m6_tests
 
-rust-test:
-	cargo test --manifest-path rust/Cargo.toml
+cpp-test: test-m0
+	@echo "Note: test-m1..m6 are expected to FAIL until you implement them."
+	-./cpp/build/ytta_m1_tests; \
+	-./cpp/build/ytta_m2_tests; \
+	-./cpp/build/ytta_m3_tests; \
+	-./cpp/build/ytta_m4_tests; \
+	-./cpp/build/ytta_m5_tests; \
+	-./cpp/build/ytta_m6_tests; \
+	true
 
-go:
-	cd go && go build ./...
-
-go-run:
-	cd go && go run ./cmd/ytta
-
-go-run-v0:
-	cd go && go run ./cmd/ytta_v0 --mode=queued --fixture ../shared/fixtures/v0/ticks.ndjson --out /tmp/ytta_go_out.ndjson
-
-go-test:
-	cd go && go test ./...
-
-java:
-	mvn -q -f java/pom.xml package
-
-java-run: java
-	java -cp java/target/ytta-java-0.1.0.jar com.ytta.App
-
-java-run-v0: java
-	java -cp java/target/ytta-java-0.1.0.jar com.ytta.v0.YttaV0 --mode=queued --fixture shared/fixtures/v0/ticks.ndjson --out /tmp/ytta_java_out.ndjson
-
-java-test:
-	mvn -q -f java/pom.xml test
-
-test: cpp-test rust-test go-test java-test
+test: test-m0
