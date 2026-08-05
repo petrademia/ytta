@@ -39,3 +39,6 @@ target_include_directories(ytta_m5_lib PUBLIC src/m5 src)
 
 add_executable(ytta_m5_tests tests/m5_strategy_test.cpp)
 target_link_libraries(ytta_m5_tests PRIVATE ytta_m5_lib)
+
+add_executable(ytta_m6_tests tests/m6_probe_test.cpp)
+target_include_directories(ytta_m6_tests PRIVATE src/m6)
