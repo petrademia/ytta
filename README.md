@@ -1,45 +1,23 @@
-# YTTA - Yield-Tuned Tick-to-Trade Architecture
+# YTTA — Yield-Tuned Tick-to-Trade Architecture
 
-YTTA is a polyglot systems project exploring tick-to-trade architecture:
-collect market/runtime signals quickly, decide quickly, and execute quickly.
+DIY lab: implement a paper tick-to-trade system in C++, guided by
+*Building Low Latency Applications with C++* (Packt).
 
-## Implementations
-- C++ (`cpp/`) — reference (v0 slice + Stage 1 hot-path)
-- Rust (`rust/`)
-- Go (`go/`)
-- Java (`java/`)
+**Start here:** [`docs/BOOK_PATH.md`](docs/BOOK_PATH.md) · progress: [`docs/PROGRESS.md`](docs/PROGRESS.md)
 
-## Current path (locked)
-
-Spec-first thin vertical slice: C++ leads each milestone, then Go / Rust / Java to golden parity.
-
-- Locked decisions: `docs/superpowers/specs/2026-07-22-v0-learning-path-design.md`
-- Messages + strategy: `specs/v0_messages.md`
-- Stage 1 hot-path: `docs/superpowers/specs/2026-07-22-stage1-hotpath.md` + `specs/stage1_hotpath.md`
-- Stage 2 sockets: `docs/superpowers/specs/2026-07-22-stage2-sockets.md` + `specs/stage2_sockets.md`
-
-## Repository Layout
-- `docs/` — architecture and design notes
-- `specs/` — protocol and behavior specs
-- `shared/schemas/v0/` — message schemas
-- `shared/fixtures/v0/` — tick fixture + golden event stream
-- `shared/fixtures/v1/` — Stage 1 burst fixture
-- `cpp/`, `rust/`, `go/`, `java/` — language-specific implementations
-
-## Quick Start
+## Quick start
 
 ```bash
-# C++ v0 / Stage 1
 make cpp
-./cpp/build/ytta_v0 --mode=queued \
-  --fixture shared/fixtures/v0/ticks.ndjson \
-  --out /tmp/ytta_v0_out.ndjson
-make cpp-test
-
-# Burst stress (no golden byte-compare)
-./cpp/build/ytta_v0 --mode=queued \
-  --fixture shared/fixtures/v1/ticks_burst.ndjson \
-  --out /tmp/ytta_burst_out.ndjson
+make test-m0          # should pass after reset
+make test-m1          # should FAIL until you implement M1
 ```
 
-Other languages: see each directory's README (ports follow C++ milestones).
+## Layout
+
+- `cpp/` — your C++ implementation + skeleton tests
+- `shared/` — schemas + fixtures (M2+)
+- `specs/messages.md` — NDJSON / matching contract
+- `go/`, `rust/`, `java/` — optional ports later
+
+Prior finished implementations and Stage-era docs live in git history, not this tree.

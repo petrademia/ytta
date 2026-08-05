@@ -1,6 +1,9 @@
-# YTTA v0 Messages and Behavior
+# YTTA Messages and Behavior (DIY)
 
-Status: **frozen** for v0 Phase 1 (C++ reference). Ports must follow this doc, not reverse-engineer C++.
+Status: **active** for milestones M2+ (paper/replay).
+
+Canonical NDJSON contracts for ticks, actions, acks, fills, and market data.
+Schemas live under `shared/schemas/v0/`. Fixtures under `shared/fixtures/v0/`.
 
 ## Streams
 
