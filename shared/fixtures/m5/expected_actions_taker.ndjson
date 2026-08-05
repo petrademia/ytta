@@ -1,0 +1,2 @@
+{"type":"action","ts_ns":1000,"action":"NEW_ORDER","cl_ord_id":1,"side":"BUY","price":100,"qty":1,"reason":"take_ask"}
+{"type":"action","ts_ns":2000,"action":"CANCEL","cl_ord_id":1,"reason":"done"}

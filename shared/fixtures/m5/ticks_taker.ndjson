@@ -1,0 +1,2 @@
+{"type":"tick","ts_ns":1000,"instrument":"INSTR1","side":"BUY","price":101,"qty":1,"seq":1}
+{"type":"tick","ts_ns":2000,"instrument":"INSTR1","side":"BUY","price":100,"qty":1,"seq":2}
