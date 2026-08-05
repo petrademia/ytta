@@ -33,12 +33,16 @@ int main() {
 
     std::string buffer(encoded.begin(), encoded.end());
     std::string payload;
-    expect(try_deframe(buffer, payload), "deframe complete frame");
+    const bool deframed = try_deframe(buffer, payload);
+    expect(deframed, "deframe complete frame");
     expect(payload == "hi", "framing round-trip");
-    expect(buffer.empty(), "deframe consumes frame");
+    if (deframed) {
+      expect(buffer.empty(), "deframe consumes frame");
+    }
   }
 
   {
+    // Stub API takes a fixed port; prefer ephemeral (listen_localhost(0) + bound port getter) when implementing.
     constexpr std::uint16_t port = 19090;
     const std::string expected = "localhost round-trip";
     bool server_listened = false;
@@ -54,7 +58,13 @@ int main() {
       std::string buffer;
       std::string payload;
       std::array<std::uint8_t, 256> chunk{};
+      const auto deadline =
+          std::chrono::steady_clock::now() + std::chrono::seconds(1);
       while (!try_deframe(buffer, payload)) {
+        if (std::chrono::steady_clock::now() >= deadline) {
+          socket.close();
+          return;
+        }
         const ssize_t received = socket.recv_some(chunk.data(), chunk.size());
         if (received <= 0) {
           socket.close();
