@@ -3,14 +3,15 @@
 #include <cstdint>
 #include <string>
 
+#include "m2/types.hpp"
+
 namespace ytta::m5 {
 
-enum class Side { Buy, Sell };
 enum class ActionType { Noop, NewOrder, Cancel };
 
 struct Tick {
   std::uint64_t ts_ns;
-  Side side;
+  ytta::m2::Side side;
   std::int64_t price;
   std::int64_t qty;
 };
@@ -24,8 +25,9 @@ struct MdSnapshot {
 
 struct Action {
   ActionType type{ActionType::Noop};
+  std::uint64_t ts_ns{0};
   std::uint64_t cl_ord_id{0};
-  Side side{Side::Buy};
+  ytta::m2::Side side{ytta::m2::Side::Buy};
   std::int64_t price{0};
   std::int64_t qty{0};
   std::string reason{"noop"};

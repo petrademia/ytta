@@ -35,7 +35,7 @@ add_executable(ytta_m4_tests tests/m4_pipeline_test.cpp)
 target_link_libraries(ytta_m4_tests PRIVATE ytta_m4_lib)
 
 add_library(ytta_m5_lib STATIC src/m5/strategy.cpp)
-target_include_directories(ytta_m5_lib PUBLIC src/m5)
+target_include_directories(ytta_m5_lib PUBLIC src/m5 src)
 
 add_executable(ytta_m5_tests tests/m5_strategy_test.cpp)
 target_link_libraries(ytta_m5_tests PRIVATE ytta_m5_lib)
