@@ -1,7 +1,7 @@
 # YTTA DIY Book Path (Design)
 
 Date: 2026-08-06  
-Status: **approved** (pending user review of this written spec)
+Status: **locked**
 
 ## Goal
 
@@ -17,7 +17,7 @@ Turn YTTA into an empty, implement-yourself lab guided by *Building Low Latency 
 | Other languages | `go/`, `rust/`, `java/` reduced to “port later” stubs; not part of finish criteria |
 | Backup | No special archive branch/tag/`reference/` copy; rely on existing git history |
 | Milestone spine | Book-led, collapsed by book **parts** into M0–M6 (Approach 2) |
-| Old Stage 0/1/2 | Archived vocabulary only; not the active checklist |
+| Old Stage 0/1/2 | Deleted from the tree; not the active checklist (recover from git history if needed) |
 
 ## Explicitly rejected
 
@@ -54,9 +54,9 @@ YTTA remains paper/replay and educational. Absolute microsecond SLOs are not mer
 
 **Done rule:** a milestone is complete when its C++ skeleton tests pass.
 
-### Mapping note (archived Stage vocabulary)
+### Mapping note (old Stage vocabulary)
 
-Old YTTA Stage 0/1/2/3 names may still appear under `docs/archive/`. They are not the active tracker. Rough overlap for orientation only:
+Stage 0/1/2/3 are not the active tracker. Rough overlap for orientation only (names deleted from the tree; recoverable from git history):
 
 - Stage 0 ≈ parts of M2 + M4
 - Stage 1 ≈ parts of M1 + M6
@@ -70,15 +70,16 @@ Old YTTA Stage 0/1/2/3 names may still appear under `docs/archive/`. They are no
 - `README.md` — DIY-first: book → milestones → how to run tests
 - `docs/PROGRESS.md` — M0–M6 checkboxes (C++ critical path)
 - `docs/BOOK_PATH.md` — per-milestone chapter links, goals, owned files, verify commands
-- Existing architecture/specs/plans/handoffs → `docs/archive/` (historical; not the spine)
+- Active design/plan under `docs/superpowers/` for the DIY path only
 
 ### Remove from working tree
 
 - Current production sources under `cpp/src`, `go/internal`, `rust/src`, `java/src` (and equivalents)
 - Stage-complete binaries/tests that assume the finished pre-DIY system
+- Historical Stage-era docs: old architecture, handoffs, stage specs/plans, superseded learning-path docs
 - Anything that makes `main` look like a finished polyglot product rather than an empty lab
 
-Recoverable via git history on `main` / prior commits.
+Recoverable via git history on `main` / prior commits. No `docs/archive/` tree.
 
 ### Scaffolds to leave
 
@@ -113,7 +114,7 @@ Skeleton tests are real assertions written up front. Stubs fail for the right re
 
 - [ ] Production implementations removed from the working tree
 - [ ] `docs/BOOK_PATH.md` and `docs/PROGRESS.md` describe M0–M6 with book chapter mapping
-- [ ] Old stage docs live under `docs/archive/` (or equivalent) and are clearly historical
+- [ ] Old Stage-era docs are deleted from the working tree (recoverable from git history)
 - [ ] C++ skeleton tests exist per milestone and fail until implemented (except M0 smoke)
 - [ ] `go/` / `rust/` / `java/` are non-blocking stubs
 - [ ] README explains the DIY path in one screen

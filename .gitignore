@@ -50,3 +50,6 @@ tmp/
 
 # Logs
 *.log
+
+# Git worktrees
+.worktrees/
