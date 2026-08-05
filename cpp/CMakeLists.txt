@@ -17,3 +17,9 @@ target_include_directories(ytta_m2_lib PUBLIC src/m2)
 
 add_executable(ytta_m2_tests tests/m2_engine_test.cpp)
 target_link_libraries(ytta_m2_tests PRIVATE ytta_m2_lib)
+
+add_library(ytta_m3_lib STATIC src/m3/net/framing.cpp src/m3/net/tcp.cpp)
+target_include_directories(ytta_m3_lib PUBLIC src/m3)
+
+add_executable(ytta_m3_tests tests/m3_net_test.cpp)
+target_link_libraries(ytta_m3_tests PRIVATE ytta_m3_lib Threads::Threads)
