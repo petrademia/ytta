@@ -57,7 +57,7 @@ int main() {
     expect(a && b && a != b && *a == 7 && *b == 8, "acquire distinct");
     pool.release(a);
     int* c = pool.acquire(9);
-    expect(c == a && *c == 9, "reuse freed slot");
+    expect(c && c == a && *c == 9, "reuse freed slot");
     pool.release(b);
     pool.release(c);
     expect(pool.free_count() == 2, "two free");
