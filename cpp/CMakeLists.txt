@@ -23,3 +23,13 @@ target_include_directories(ytta_m3_lib PUBLIC src/m3)
 
 add_executable(ytta_m3_tests tests/m3_net_test.cpp)
 target_link_libraries(ytta_m3_tests PRIVATE ytta_m3_lib Threads::Threads)
+
+add_library(ytta_m4_lib STATIC src/m4/pipeline.cpp)
+target_include_directories(ytta_m4_lib PUBLIC src/m4 src/m2)
+target_link_libraries(ytta_m4_lib PUBLIC ytta_m2_lib)
+
+add_executable(ytta_m4 src/m4_main.cpp)
+target_link_libraries(ytta_m4 PRIVATE ytta_m4_lib)
+
+add_executable(ytta_m4_tests tests/m4_pipeline_test.cpp)
+target_link_libraries(ytta_m4_tests PRIVATE ytta_m4_lib)
